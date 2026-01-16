@@ -4,17 +4,21 @@ This project provides an integrated environment for running load tests against a
 
 ## Features
 
-### 🚀 Locust Runner
--   **Interactive Control Panel:** Configure, start, and stop tests via UI.
--   **Execution Timer:** Live countdown and progress bar for test duration.
--   **Dynamic Query Selection:** Run specific SQL files (e.g., `heavy_analytic_query.sql`) by name.
--   **Robust Process Management:** Handles long-running tests with proper log buffering.
+### 🏠 Dashboard Home
+- **Performance Overview:** Key metrics (Average Response Time, Success Rate) from the last test.
+- **Comparative Analysis:** Visual indicators (deltas) comparing current results against historical averages.
+- **📜 Test Run History:** Complete history of executions with CSV export functionality.
 
-### 📊 Real-time Monitoring & History
--   **Live CloudWatch Metrics:** Visualizes CPU, Connections, IOPS, and Storage usage (simulated via LocalStack).
--   **Log Analysis:** Query "CloudWatch Logs" for slow queries and errors directly from the dashboard.
--   **Test Persistence:** Automatically saves test results to a history file (`test_history.csv`).
--   **History Dashboard:** View trends of response times and failures across all past executions.
+### 🚀 Locust Runner
+- **Interactive Control Panel:** Configure, start, and stop tests via UI.
+- **Selection Controls:** Easily select specific queries or use "Select All" functionality.
+- **Execution Timer:** Live countdown and progress bar for test duration.
+- **Bottleneck Detection:** Top 5 slowest queries identified automatically in real-time.
+
+### 📊 Database Performance
+- **Live CloudWatch Metrics:** Visualizes CPU, Connections, IOPS, and Storage usage (Real AWS or LocalStack).
+- **Auto-Refresh:** Dashboard updates every 30 seconds to show the latest infrastructure health.
+- **Log Analysis:** Integrated RDS logs (Slow Query, Error, General) directly in the dashboard.
 
 ### 🗄️ Database Environment
 -   **Expanded Schema:** Includes `users`, `products`, `orders`, `reviews`, and `categories`.
@@ -33,17 +37,23 @@ This project provides an integrated environment for running load tests against a
 
 ## Architecture
 
-*   **App Service:** Streamlit dashboard + Locust runner.
-*   **DB Service:** PostgreSQL 13 (simulating RDS).
-*   **LocalStack:** Simulates AWS CloudWatch and Secrets Manager.
+*   **App Service:** Streamlit dashboard (v1.x) + Locust (v2.x).
+*   **DB Service:** PostgreSQL 13 (simulating RDS locally).
+*   **LocalStack:** Simulates AWS CloudWatch and Secrets Manager for local development.
+*   **AWS Integration:** Native support for real RDS, Secrets Manager, and CloudWatch.
 
 ## Configuration
 
 You can configure the environment behaviour using environment variables in `docker-compose.yml` or your `.env` file.
 
 ### Hybrid Mode (LocalStack vs Real AWS)
-*   **`USE_LOCALSTACK=true`** (Default): The application connects to the local LocalStack container for CloudWatch and Secrets Manager. Ideal for offline development and testing.
-*   **`USE_LOCALSTACK=false`**: The application ignores the local endpoint and connects to real AWS services using your configured credentials (`~/.aws/credentials` or env vars). Use this for integration testing or staging.
+*   **`USE_LOCALSTACK=true`** (Default): The application connects to the local LocalStack container. Ideal for offline development.
+    - **Queries:** Pre-built queries in the `queries/` directory are designed to work with the local schema and sample data.
+*   **`USE_LOCALSTACK=false`**: The application connects to real AWS services.
+    - **Authentication:** Mounts `~/.aws` for seamless integration with local profiles.
+    - **Secrets:** Fetches DB credentials securely from AWS Secrets Manager.
+    - **Monitoring:** Pulls real metrics from CloudWatch (Last 60 mins).
+    - **Custom Queries:** When testing against a production or staging RDS instance, ensure you add your specific `.sql` files to the `queries/` directory to analyze the performance of your own business logic.
 
 ## Features Guide
 
