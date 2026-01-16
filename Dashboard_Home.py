@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(
     page_title="Locust Performance Dashboard",
-    page_icon="🚀",
+    page_icon="🏠",
     layout="wide"
 )
 
@@ -10,13 +10,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-st.set_page_config(
-    page_title="Locust Performance Dashboard",
-    page_icon="🚀",
-    layout="wide"
-)
-
-st.title("🚀 Performance Control Center & History")
+st.title("🏠 Performance Control Center & History")
 
 st.markdown("""
 **👈 Use the sidebar to navigate:**
@@ -36,13 +30,20 @@ if os.path.exists(history_file):
         
         if not history_df.empty:
             # Display summary metrics
-            col1, col2, col3 = st.columns(3)
+            st.subheader("Key Performance Indicators (Overall)")
+            col1, col2, col3, col4 = st.columns(4)
+            
+            avg_resp = history_df['Avg Response Time'].mean()
+            last_resp = history_df['Avg Response Time'].iloc[-1]
+            resp_delta = last_resp - avg_resp
+
             col1.metric("Total Tests Run", len(history_df))
-            col2.metric("Avg Response Time (All Tests)", f"{history_df['Avg Response Time'].mean():.2f} ms")
-            col3.metric("Total Failures Recorded", history_df['Total Failures'].sum())
+            col2.metric("Avg Response Time", f"{last_resp:.2f} ms", delta=f"{resp_delta:.2f} ms", delta_color="inverse")
+            col3.metric("Max Response Time", f"{history_df['Max Response Time'].max():.2f} ms")
+            col4.metric("Total Failures", history_df['Total Failures'].sum(), delta=int(history_df['Total Failures'].iloc[-1]), delta_color="inverse")
 
             # Charts
-            st.subheader("Performance Trends")
+            st.subheader("Performance Trends Across Runs")
             chart_col1, chart_col2 = st.columns(2)
             
             with chart_col1:

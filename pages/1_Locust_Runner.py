@@ -144,7 +144,6 @@ def send_process(selected_queries, num_users, spawn_rate, run_time):
     # No, Popen uses the OS file descriptor.
     pass # valid python indentation placeholder
     st.sidebar.success("Locust test started!")
-    st.rerun()
 
 
 def stop_process():
@@ -170,7 +169,6 @@ def stop_process():
             save_test_history(**st.session_state.last_config)
             
         st.sidebar.success("Locust test stopped.")
-        st.rerun()
     else:
         st.sidebar.warning("No test is currently running.")
 
@@ -184,15 +182,23 @@ def get_stats():
             stats_df = pd.read_csv("stats_stats.csv")
             stats_history_df = pd.read_csv("stats_stats_history.csv")
             
+            # Highlight slow queries
+            if not stats_df.empty:
+                st.subheader("🐢 Slowest Queries (Current Test)")
+                # Filter out Aggregated and sort by Average Response Time
+                slow_queries = stats_df[stats_df["Name"] != "Aggregated"].sort_values(by="Average Response Time", ascending=False).head(5)
+                
+                # Show as cards or a simplified table
+                cols = st.columns(len(slow_queries) if len(slow_queries) > 0 else 1)
+                for idx, (i, row) in enumerate(slow_queries.iterrows()):
+                    with cols[idx]:
+                        st.metric(row["Name"], f"{row['Average Response Time']:.0f}ms", delta=f"{row['Max Response Time']:.0f}ms max", delta_color="off")
+
             st.subheader("Current Statistics")
-            st.dataframe(stats_df)
+            st.dataframe(stats_df, use_container_width=True)
             
             if not stats_history_df.empty:
                 st.subheader("Test Statistics History")
-
-                # --- FINAL DEBUG: Show unique values in the 'Name' column ---
-                with st.expander("Debug: Unique values in 'Name' column"):
-                    st.write(stats_history_df["Name"].unique())
 
                 # Locust's history CSV logs stats for each endpoint AND an aggregated total.
                 # We only want to plot the aggregated total for these charts.
@@ -225,7 +231,7 @@ def get_stats():
 def main():
     # Set main page 
     st.set_page_config(layout="wide")
-    st.title("Locust Performance Control Center")
+    st.title("🚀 Locust Performance Runner")
 
     # Initialize session state
     if 'locust_process' not in st.session_state:
@@ -286,13 +292,34 @@ def main():
     # Query selection
     queries_path = "queries"
     if os.path.exists(queries_path):
-        sql_files = [f for f in os.listdir(queries_path) if f.endswith('.sql')]
-        selected_queries = st.sidebar.multiselect(
-            "Select Queries to Run", 
-            sql_files, 
-            default=sql_files,
-            disabled=st.session_state.test_running
-        )
+        sql_files = sorted([f for f in os.listdir(queries_path) if f.endswith('.sql')])
+        
+        st.sidebar.subheader("🔍 Query Selection")
+        
+        # Select all / None helper
+        select_all = st.sidebar.checkbox("Select all queries", value=True, disabled=st.session_state.test_running)
+        
+        if select_all:
+            selected_queries = st.sidebar.multiselect(
+                "Queries to include in test:", 
+                sql_files, 
+                default=sql_files,
+                disabled=st.session_state.test_running,
+                help="These SQL files will be executed randomly by the simulated users."
+            )
+        else:
+            selected_queries = st.sidebar.multiselect(
+                "Queries to include in test:", 
+                sql_files, 
+                default=[],
+                disabled=st.session_state.test_running,
+                help="These SQL files will be executed randomly by the simulated users."
+            )
+        
+        if selected_queries:
+            st.sidebar.caption(f"✅ {len(selected_queries)} queries selected")
+        else:
+            st.sidebar.error("⚠️ Select at least one query")
     else:
         st.sidebar.warning(f'Directory "{queries_path}" not found.')
         selected_queries = []
@@ -341,7 +368,11 @@ def main():
             st.success("✅ Test completed! Results are displayed below.")
 
     # --- Locust Test Results Display ---
-    st.header("Locust Test Results")
+    if st.session_state.test_running:
+        st.header("⚡ Real-time Performance Metrics")
+    else:
+        st.header("📊 Last Test Results")
+    
     get_stats()
 if __name__ == "__main__":
     main()

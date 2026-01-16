@@ -12,7 +12,8 @@ def get_rds_metrics(instance_id):
     client = get_aws_client('cloudwatch')
     
     end_time = datetime.utcnow()
-    start_time = end_time - timedelta(minutes=15)
+    # Expand start_time to 60 minutes to ensure we capture the simulated data
+    start_time = end_time - timedelta(minutes=60)
     
     # Define metrics to fetch
     metrics = [
@@ -119,18 +120,33 @@ def get_rds_logs(instance_id, log_type='error'):
 
 def main():
     st.set_page_config(layout="wide")
-    st.title("AWS RDS Performance Dashboard (CloudWatch)")
+    st.title("📊 AWS RDS Performance Dashboard")
 
     instance_id = os.environ.get("DB_INSTANCE_IDENTIFIER", "locust-rds-instance")
     
     st.info(f"Monitoring RDS Instance: **{instance_id}**")
 
     # --- Metrics Section ---
-    st.header("CloudWatch Metrics (Last 15 Minutes)")
+    st.header("CloudWatch Metrics (Last 60 Minutes)")
+    
+    # Auto-refresh logic
+    if "auto_refresh" not in st.session_state:
+        st.session_state.auto_refresh = True
+    
+    st.sidebar.divider()
+    st.session_state.auto_refresh = st.sidebar.checkbox("Auto-refresh (30s)", value=st.session_state.auto_refresh)
     
     metrics_df = get_rds_metrics(instance_id)
     
     if not metrics_df.empty:
+        # Summary metrics
+        m1, m2, m3, m4 = st.columns(4)
+        latest = metrics_df.iloc[-1]
+        m1.metric("CPU Utilization", f"{latest['CPUUtilization']:.1f}%")
+        m2.metric("Connections", int(latest['DatabaseConnections']))
+        m3.metric("Read IOPS", f"{latest['ReadIOPS']:.1f}")
+        m4.metric("Write IOPS", f"{latest['WriteIOPS']:.1f}")
+
         col1, col2 = st.columns(2)
         
         with col1:
@@ -149,6 +165,10 @@ def main():
             st.line_chart(metrics_df['FreeStorage_GB'])
     else:
         st.warning("No metrics found in CloudWatch. Ensure the RDS instance is active and reporting.")
+
+    if st.session_state.auto_refresh:
+        time.sleep(30)
+        st.rerun()
 
     # --- Logs Section ---
     st.divider()

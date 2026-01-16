@@ -1,17 +1,19 @@
 -- Seed categories
 INSERT INTO categories (name, description) VALUES
-('Electronics', 'Devices, gadgets, and tech'),
-('Books', 'Fiction, non-fiction, and textbooks'),
-('Clothing', 'Apparel and accessories'),
-('Home & Kitchen', 'Home appliances and kitchenware'),
-('Sports', 'Outdoor and indoor sports equipment');
+    ('Electronics', 'Devices, gadgets, and tech'),
+    ('Books', 'Fiction, non-fiction, and textbooks'),
+    ('Clothing', 'Apparel and accessories'),
+    ('Home & Kitchen', 'Home appliances and kitchenware'),
+    ('Sports', 'Outdoor and indoor sports equipment')
+ON CONFLICT DO NOTHING;
 
 -- Seed 1000 users
 INSERT INTO users (name, email)
 SELECT 
     'User ' || i, 
     'user' || i || '@example.com'
-FROM generate_series(4, 1000) AS i;
+FROM generate_series(4, 1000) AS i
+ON CONFLICT (email) DO NOTHING;
 
 -- Seed 500 products
 INSERT INTO products (category_id, name, description, price, stock_quantity)

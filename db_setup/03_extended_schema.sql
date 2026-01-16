@@ -1,11 +1,11 @@
 -- Extended schema to simulate a more complex production environment
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT
 );
 
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id SERIAL PRIMARY KEY,
     category_id INTEGER REFERENCES categories(id),
     name VARCHAR(255) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY,
     product_id INTEGER REFERENCES products(id),
     user_id INTEGER REFERENCES users(id),
@@ -25,6 +25,6 @@ CREATE TABLE reviews (
 );
 
 -- Add some indexes for performance testing
-CREATE INDEX idx_products_category ON products(category_id);
-CREATE INDEX idx_reviews_product ON reviews(product_id);
-CREATE INDEX idx_orders_user ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_product ON reviews(product_id);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);

@@ -11,13 +11,22 @@ def get_aws_client(service_name):
     endpoint_url = None
     if use_localstack:
         endpoint_url = os.environ.get("AWS_ENDPOINT_URL")
+    else:
+        # Explicitly set to None to avoid boto3 picking up AWS_ENDPOINT_URL from env
+        # when we want to use real AWS.
+        endpoint_url = None
 
     session = boto3.session.Session()
-    return session.client(
-        service_name=service_name,
-        region_name=region_name,
-        endpoint_url=endpoint_url
-    )
+    client_kwargs = {
+        'service_name': service_name,
+        'region_name': region_name,
+    }
+    
+    # Only add endpoint_url if we are using LocalStack
+    if use_localstack and endpoint_url:
+        client_kwargs['endpoint_url'] = endpoint_url
+        
+    return session.client(**client_kwargs)
 
 def get_secret():
     secret_name = os.environ.get("SECRET_NAME")

@@ -1,7 +1,8 @@
-INSERT INTO users (name, email) VALUES
+INSERT INTO users (name, email) VALUES 
 ('John Doe', 'john.doe@example.com'),
 ('Jane Smith', 'jane.smith@example.com'),
-('Peter Jones', 'peter.jones@example.com');
+('Peter Jones', 'peter.jones@example.com')
+ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO orders (user_id, order_date, amount) VALUES
 (1, '2025-10-15', 100.50),
