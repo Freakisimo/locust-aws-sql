@@ -1,6 +1,12 @@
-# Locust Performance Testing Tool (Hybrid Local/AWS)
+# ZerSQL: Zero-friction SQL Performance Testing
+⚡ **From zero to load testing in seconds. The ultimate hybrid SQL load runner.**
 
 This project provides an integrated environment for running load tests against a SQL database using Locust, simulating AWS services (CloudWatch, Secrets Manager, RDS) locally via LocalStack, and visualizing results in a custom Streamlit dashboard.
+
+### 🔗 Recommended Infrastructure Setup
+ZerSQL is designed to work seamlessly with real AWS environments without risking production data. 
+We highly recommend using our companion Terraform module to automatically spin up a secure, production-like clone of your database for testing:
+👉 **[Terraform RDS Snapshot Clone Module](https://registry.terraform.io/modules/Freakisimo/rds-snapshot-clone/aws/latest)**
 
 ## Features
 
@@ -9,7 +15,7 @@ This project provides an integrated environment for running load tests against a
 - **Comparative Analysis:** Visual indicators (deltas) comparing current results against historical averages.
 - **📜 Test Run History:** Complete history of executions with CSV export functionality.
 
-### 🚀 Locust Runner
+### 🚀 ZerSQL Runner
 - **Interactive Control Panel:** Configure, start, and stop tests via UI.
 - **Selection Controls:** Easily select specific queries or use "Select All" functionality.
 - **Execution Timer:** Live countdown and progress bar for test duration.
@@ -58,7 +64,7 @@ You can configure the environment behaviour using environment variables in `dock
 ## Features Guide
 
 ### Running a Test
-1.  Go to the **Locust Runner** page.
+1.  Go to the **ZerSQL Runner** page.
 2.  Select the queries you want to test (e.g., `heavy_analytic_query.sql`).
 3.  Set users, spawn rate, and run time (e.g., `10m`).
 4.  Click **Start Test**.

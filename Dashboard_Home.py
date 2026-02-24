@@ -1,8 +1,8 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="Locust Performance Dashboard",
-    page_icon="🏠",
+    page_title="ZerSQL Performance Dashboard",
+    page_icon="⚡",
     layout="wide"
 )
 
@@ -10,12 +10,12 @@ import streamlit as st
 import pandas as pd
 import os
 
-st.title("🏠 Performance Control Center & History")
+st.title("⚡ ZerSQL Control Center")
 
 st.markdown("""
 **👈 Use the sidebar to navigate:**
-- **Locust Runner**: Run new performance tests.
-- **Database Performance**: Monitor live CloudWatch metrics.
+- **ZerSQL Runner**: Configure and run new SQL performance tests.
+- **Database Performance**: Monitor live CloudWatch metrics (RDS or LocalStack).
 """)
 
 st.divider()

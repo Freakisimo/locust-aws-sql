@@ -230,9 +230,9 @@ def get_stats():
 
 def main():
     # Set main page 
-    st.set_page_config(layout="wide")
-    st.title("🚀 Locust Performance Runner")
-
+    st.set_page_config(layout="wide", page_title="ZerSQL Runner", page_icon="⚡")
+    st.title("⚡ ZerSQL Performance Runner")
+    st.markdown("Select SQL queries, configure load parameters, and run performance tests against your database.")
     # Initialize session state
     if 'locust_process' not in st.session_state:
         st.session_state.locust_process = None

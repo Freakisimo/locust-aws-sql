@@ -119,8 +119,8 @@ def get_rds_logs(instance_id, log_type='error'):
         return pd.DataFrame(columns=['@timestamp', '@message'])
 
 def main():
-    st.set_page_config(layout="wide")
-    st.title("📊 AWS RDS Performance Dashboard")
+    st.set_page_config(layout="wide", page_title="ZerSQL Database Performance", page_icon="⚡")
+    st.title("⚡ ZerSQL Database Performance Dashboard")
 
     instance_id = os.environ.get("DB_INSTANCE_IDENTIFIER", "locust-rds-instance")
     
